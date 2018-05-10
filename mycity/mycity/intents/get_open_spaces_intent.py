@@ -70,7 +70,7 @@ def get_closest_open_space(origin_address, open_spaces):
         'open_spaces:',
         open_spaces
         )
-    addr_to_record = csv_utils.map_addresses_to_records(open_spaces)
+    addr_to_record = csv_utils.map_attribute_to_records('ADDRESS', open_spaces)
     destinations = [park.Address for park in open_spaces]
     all_parks = g_maps_utils._get_driving_info(origin_address,
                                                "Open Space",
