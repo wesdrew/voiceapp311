@@ -19,6 +19,22 @@ from .intents import intent_constants
 LOG_CLASS = '\n\n[class: MyCityController]'
 
 
+# dictionaries mapping intent names to functions with logic to process
+# that intent. Intents that need an address for the user before execution are
+# in a separate dictionary. The controller will check for an address and may 
+# request the user's address before executing the intent. "SetAddressIntent"
+# is a special case and is handled separately. Functions defined in this 
+# module are added to these dictionaries after their definition
+
+INTENTS_NO_ADDRESS_NEEDED = { "GetAddressIntent" : get_address_from_session,
+                              "GetAlertsIntent" : get_alerts_intent,
+                              "UnhandledIntent" : unhandled_intent }
+
+
+INTENTS_NEED_ADDRESS = { "TrashDayIntent" : get_trash_day_info,
+                         "SnowParkingIntent" : get_snow_emergency_parking_intent }
+
+
 def execute_request(mycity_request):
     """
     Route the incoming request based on type (LaunchRequest, IntentRequest,
@@ -99,50 +115,36 @@ def on_intent(mycity_request):
         'MyCityRequestDataModel received:',
         mycity_request
     )
+    addr_key = intent_constants.CURRENT_ADDRESS_KEY
+    intent_prompted_from = intent_constants.ADDRESS_PROMPTED_FROM_INTENT
 
     # Check if the user is setting the address. This is special cased
     # since they may have been prompted for this info from another intent
     if mycity_request.intent_name == "SetAddressIntent":
         set_address_in_session(mycity_request)
-
-        if intent_constants.ADDRESS_PROMPTED_FROM_INTENT \
-                in mycity_request.session_attributes:
+        if intent_prompted_from in mycity_request.session_attributes:
             # User was prompted for address from another intent.
             # Set our current intent to be that original intent now that
             # we have set the address.
-            mycity_request.intent_name = mycity_request.session_attributes[intent_constants.ADDRESS_PROMPTED_FROM_INTENT]
+            mycity_request.intent_name = \
+                mycity_request.session_attributes[intent_prompted_from]
             print("Address set after calling another intent. Redirecting "
                   "intent to {}".format(mycity_request.intent_name))
             # Delete the session key indicating this intent was called
             # from another intent.
-            del mycity_request.session_attributes[intent_constants.ADDRESS_PROMPTED_FROM_INTENT]
+            del mycity_request.session_attributes[intent_prompted_from]
         else:
-            return get_address_from_session(mycity_request)
+            return get_address_from_session(mycity_request) 
 
     # session_attributes = session.get("attributes", {})
-    if mycity_request.intent_name == "GetAddressIntent":
-        return get_address_from_session(mycity_request)
-    elif mycity_request.intent_name == "TrashDayIntent":
+    if mycity_request.intent_name in INTENTS_NO_ADDRESS_NEEDED:
+        return INTENTS_NO_ADDRESS_NEEDED[mycity_request.intent_name](mycity_request)
+    elif mycity_request.intent_name in INTENTS_NEED_ADDRESS:
         return request_user_address_response(mycity_request) \
-            if intent_constants.CURRENT_ADDRESS_KEY \
-            not in mycity_request.session_attributes \
-            else get_trash_day_info(mycity_request)
-    elif mycity_request.intent_name == "SnowParkingIntent":
-        return request_user_address_response(mycity_request) \
-            if intent_constants.CURRENT_ADDRESS_KEY \
-            not in mycity_request.session_attributes \
-            else get_snow_emergency_parking_intent(mycity_request)
-    elif mycity_request.intent_name == "GetAlertsIntent":
-        return get_alerts_intent(mycity_request)
-    elif mycity_request.intent_name == "AMAZON.HelpIntent":
-        return get_welcome_response(mycity_request)
-    elif mycity_request.intent_name == "AMAZON.StopIntent" or \
-            mycity_request.intent_name == "AMAZON.CancelIntent":
-        return handle_session_end_request(mycity_request)
-    elif mycity_request.intent_name == "UnhandledIntent":
-        return unhandled_intent(mycity_request)
+            if addr_key not in mycity_request.session_attributes \
+            else INTENTS_NEED_ADDRESS[mycity_request.intent_name](mycity_request)
     else:
-        raise ValueError("Invalid intent")
+        raise ValueError("Invalid Intent")
 
 
 def on_session_ended(mycity_request):
@@ -184,6 +186,9 @@ def get_welcome_response(mycity_request):
     mycity_response.should_end_session = False
     return mycity_response
 
+# add function to intents dict
+INTENTS_NO_ADDRESS_NEEDED["AMAZON.HelpIntent"] = get_welcome_response
+
 
 def handle_session_end_request(mycity_request):
     mycity_response = MyCityResponseDataModel()
@@ -195,5 +200,7 @@ def handle_session_end_request(mycity_request):
     mycity_response.should_end_session = True
     return mycity_response
 
-
+# add function to intents dict
+INTENTS_NO_ADDRESS_NEEDED["AMAZON.StopIntent"] = handle_session_end_request
+INTENTS_NO_ADDRESS_NEEDED["AMAZON.CancelIntent"] = handle_session_end_request
 
