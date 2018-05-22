@@ -34,7 +34,6 @@ INTENTS_NO_ADDRESS_NEEDED = { "GetAddressIntent" : get_address_from_session,
 INTENTS_NEED_ADDRESS = { "TrashDayIntent" : get_trash_day_info,
                          "SnowParkingIntent" : get_snow_emergency_parking_intent }
 
-
 def execute_request(mycity_request):
     """
     Route the incoming request based on type (LaunchRequest, IntentRequest,

@@ -91,9 +91,11 @@ class MyCityControllerUnitTestCase(base.BaseTestCase):
 
     @mock.patch('mycity.mycity_controller.request_user_address_response')
     def test_intent_that_needs_address_without_address_in_session_attributes(self, mock_intent):
-        self.request.intent_name = "TrashDayIntent"
-        self.controller.on_intent(self.request)
-        mock_intent.assert_called_with(self.request)
+        with mock.patch.dict('mycity.mycity_controller.INTENTS_NEED_ADDRESS',
+                        { "TrashDayIntent": mock_intent }):
+            self.request.intent_name = "TrashDayIntent"
+            self.controller.on_intent(self.request)
+            mock_intent.assert_called_with(self.request)
 
     def test_unknown_intent(self):
         self.request.intent_name = "MadeUpIntent"
