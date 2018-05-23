@@ -31,3 +31,4 @@ if __name__ == "__main__":
     test_suite = load_tests()
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
+

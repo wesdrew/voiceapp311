@@ -28,4 +28,12 @@ class TestGoogleMapsUtilities(base.BaseTestCase):
         to_test = g_maps_utils._setup_google_maps_query_params(origin, dests)
         self.assertEqual(origin, to_test["origins"])
         self.assertEqual(dests, to_test["destinations"].split("|"))
-        self.assertEqual("imperial", to_test["units"])    
+        self.assertEqual("imperial", to_test["units"])
+
+    @unittest.skipUnless(HAS_INTERNET_CONNECTION)
+    def test_get_driving_info(self):
+        origin = "46 Everdean St Boston, MA"
+        location_type = "FAKE"
+        dests = ["1000 Dorchester Ave Boston, MA", "94 Sawyer Ave Boston, MA"]
+        to_test = g_maps_utils._get_driving_info(origin, location_type, dests)
+        self.assert
