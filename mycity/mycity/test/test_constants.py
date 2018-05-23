@@ -1,18 +1,30 @@
 import os
+import urllib3
+
+"""
+Set flag HAS_INTERNET_CONNECTION. If HAS_INTERNET_CONNECTION is True, unittests
+and integration tests that use a web resource can execute along with tests with
+mocked objects and functions
+"""
+
+http = urllib3.PoolManager()
+
+try:
+    http.request("GET", "www.google.com")
+    HAS_INTERNET_CONNECTION = True
+except:
+    HAS_INTERNET_CONNECTION = False
 
 #CSV files for testing location_util's csv functions
 PARKING_LOTS_TEST_CSV = os.getcwd() + "/mycity/test/test_data/Snow_Emergency_Parking.csv"
-
 
 # because getcwd() will be run from project root we need to append test_data's path
 PARKING_LOTS_TEST_DATA = os.getcwd() + "/mycity/test/test_data/parking_lots"
 PARKING_LOTS_ADDR_INDEX = 7
 
-
 ##################################################################
 # Mocked returns for patched functions that access web resources #
 ##################################################################
-
 
 # gis_utils.get_closest_feature
 

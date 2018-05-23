@@ -6,11 +6,13 @@ import mycity.test.integration_tests.test_unhandled_intent as unhandled_intent
 import mycity.test.integration_tests.test_get_alerts as get_alerts
 import mycity.test.unit_tests.test_mycity_controller as my_controller
 import mycity.test.unit_tests.test_address_utils as address_utils
+import mycity.test.unit_tests.test_google_maps_utils as g_maps_utils
 import mycity.test.unit_tests.test_csv_utils as csv_utils
 import mycity.test.unit_tests.test_gis_utils as gis_utils
 
 
 TEST_CASES = [  my_controller.MyCityControllerUnitTestCase,
+                g_maps_utils.TestGoogleMapsUtilities,
                 address_utils.AddressUtilitiesTestCase,
                 csv_utils.CSVUtilitiesTestCase,
                 gis_utils.GISUtilitiesTestCase,
