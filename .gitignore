@@ -1,6 +1,10 @@
 # emacs copy files
 *~
 
+# pycharm files
+
+*/.idea/*
+
 # virtualenv files/dirs
 
 bin/*
