@@ -15,7 +15,6 @@ from .intents.get_alerts_intent import get_alerts_intent
 from .intents.snow_parking_intent import get_snow_emergency_parking_intent
 from .intents import intent_constants
 
-
 LOG_CLASS = '\n\n[class: MyCityController]'
 
 
@@ -127,18 +126,27 @@ def on_intent(mycity_request):
         # Capture that into session data here
         set_address_in_session(mycity_request)
 
+    # MORE INFO CODE
+    if "Wants_More_Info" in mycity_request.intent_variables:
+        if mycity_request.intent_variables["Wants_More_Info"] == "Yes":
+            pass  # do something
+        else:
+            pass  # purge "more_info" session attribute
+
+        del mycity_request.intent_variables["Wants_More_Info"]  # purge "Wants_More_Info" from intent_variables
+
     # session_attributes = session.get("attributes", {})
     if mycity_request.intent_name == "GetAddressIntent":
         return get_address_from_session(mycity_request)
     elif mycity_request.intent_name == "TrashDayIntent":
         return request_user_address_response(mycity_request) \
             if intent_constants.CURRENT_ADDRESS_KEY \
-            not in mycity_request.session_attributes \
+               not in mycity_request.session_attributes \
             else get_trash_day_info(mycity_request)
     elif mycity_request.intent_name == "SnowParkingIntent":
         return request_user_address_response(mycity_request) \
             if intent_constants.CURRENT_ADDRESS_KEY \
-            not in mycity_request.session_attributes \
+               not in mycity_request.session_attributes \
             else get_snow_emergency_parking_intent(mycity_request)
     elif mycity_request.intent_name == "GetAlertsIntent":
         return get_alerts_intent(mycity_request)
@@ -223,4 +231,44 @@ def handle_session_end_request(mycity_request):
     return mycity_response
 
 
+# DIALOG OPTION FOR MORE INFO STARTS HERE
+
+def check_for_more_info(mycity_request):
+    """
+    Creates a response to request whether the user wants more
+    information
+
+    :param mycity_request: MyCityRequestDataModel object
+    :return: MyCityResponseDataModel object
+    """
+    print(
+        '[module: mycity_controller]',
+        '[method: check_for_more_info]',
+        'MyCityRequestDataModel received:',
+        str(mycity_request)
+    )
+
+    mycity_response = MyCityResponseDataModel()
+
+    mycity_response.session_attributes = mycity_request.session_attributes
+    mycity_response.should_end_session = False
+
+    mycity_response.dialog_directive = "Delegate"
+    return mycity_response
+
+
+def give_more_info_response(mycity_request):
+    """
+    Creates a response to request more_information field saved in session 
+    attributes 
+
+    :param mycity_request: MyCityRequestDataModel object
+    :return: MyCityResponseDataModel object
+    """
+    print(
+        '[module: mycity_controller]',
+        '[method: give_more_info_response]',
+        'MyCityRequestDataModel received:',
+        str(mycity_request)
+    )
 

@@ -175,7 +175,14 @@
                         "value": "What's your address?"
                     }
                 ]
-            }
+            },
+	    // slot for intents that want more info
+	    {
+		"id": "Elicit.Slot.more_info",
+		"variations" [
+		    {
+			"type": 
+	    }
         ]
     }
 }
