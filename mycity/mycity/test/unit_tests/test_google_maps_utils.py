@@ -45,9 +45,9 @@ class TestGoogleMapsUtilities(base.BaseTestCase):
         dests = ["1000 Dorchester Ave Boston, MA", "94 Sawyer Ave Boston, MA"]
         to_test = g_maps_utils._get_driving_info(origin, location_type, dests)
         expected = [{'Driving distance': 2207, 'Driving distance text': '1.4 mi', 
-                     'Driving time': 397, 'Driving time text': '7 mins', 
+                     'Driving time': 399, 'Driving time text': '7 mins', 
                      'FAKE': '1000 Dorchester Ave Boston, MA'}, 
                     {'Driving distance': 2458, 'Driving distance text': '1.5 mi',
-                     'Driving time': 425, 'Driving time text': '7 mins', 
+                     'Driving time': 427, 'Driving time text': '7 mins', 
                      'FAKE': '94 Sawyer Ave Boston, MA'}]
         self.assertEqual(to_test, expected)
